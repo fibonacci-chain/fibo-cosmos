@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	"cosmossdk.io/core/address"
+
 	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -45,11 +47,15 @@ type AccountKeeperI interface {
 
 	// Fetch the next account number, and increment the internal counter.
 	GetNextAccountNumber(sdk.Context) uint64
+
+	// AddressCodec returns the account address codec.
+	AddressCodec() address.Codec
 }
 
 // AccountKeeper encodes/decodes accounts using the go-amino (binary)
 // encoding/decoding library.
 type AccountKeeper struct {
+	addressCodec  address.Codec
 	key           sdk.StoreKey
 	cdc           codec.BinaryCodec
 	paramSubspace paramtypes.Subspace
@@ -69,7 +75,7 @@ var _ AccountKeeperI = &AccountKeeper{}
 // may use auth.Keeper to access the accounts permissions map.
 func NewAccountKeeper(
 	cdc codec.BinaryCodec, key sdk.StoreKey, paramstore paramtypes.Subspace, proto func() types.AccountI,
-	maccPerms map[string][]string,
+	maccPerms map[string][]string, ac address.Codec,
 ) AccountKeeper {
 
 	// set KeyTable if it has not already been set
@@ -83,12 +89,19 @@ func NewAccountKeeper(
 	}
 
 	return AccountKeeper{
+		addressCodec:  ac,
 		key:           key,
 		proto:         proto,
 		cdc:           cdc,
 		paramSubspace: paramstore,
 		permAddrs:     permAddrs,
 	}
+}
+
+// AddressCodec returns the x/auth account address codec.
+// x/auth is tied to bech32 encoded user accounts
+func (ak AccountKeeper) AddressCodec() address.Codec {
+	return ak.addressCodec
 }
 
 // Logger returns a module-specific logger.
