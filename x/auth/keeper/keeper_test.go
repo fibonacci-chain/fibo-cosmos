@@ -9,10 +9,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 )
-
+s
 const (
 	holder     = "holder"
 	multiPerm  = "multiple permissions account"
@@ -133,6 +134,7 @@ func TestSupply_ValidatePermissions(t *testing.T) {
 	keeper := keeper.NewAccountKeeper(
 		cdc, app.GetKey(types.StoreKey), app.GetSubspace(types.ModuleName),
 		types.ProtoBaseAccount, maccPerms,
+		authcodec.NewBech32Codec("cosmos"),
 	)
 
 	err := keeper.ValidatePermissions(multiPermAcc)

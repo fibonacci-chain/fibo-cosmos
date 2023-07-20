@@ -10,6 +10,7 @@ import (
 	tmtime "github.com/cosmos/cosmos-sdk/std"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting/exported"
@@ -83,6 +84,7 @@ func (suite *IntegrationTestSuite) initKeepersWithmAccPerms(blockedAddrs map[str
 	authKeeper := authkeeper.NewAccountKeeper(
 		appCodec, app.GetKey(types.StoreKey), app.GetSubspace(types.ModuleName),
 		authtypes.ProtoBaseAccount, maccPerms,
+		authcodec.NewBech32Codec("bank"),
 	)
 	keeper := keeper.NewBaseKeeperWithDeferredCache(
 		appCodec, app.GetKey(types.StoreKey), authKeeper,
@@ -1254,6 +1256,7 @@ func (suite *IntegrationTestSuite) TestBalanceTrackingEvents() {
 	suite.app.AccountKeeper = authkeeper.NewAccountKeeper(
 		suite.app.AppCodec(), suite.app.GetKey(authtypes.StoreKey), suite.app.GetSubspace(authtypes.ModuleName),
 		authtypes.ProtoBaseAccount, maccPerms,
+		authcodec.NewBech32Codec("bank"),
 	)
 
 	suite.app.BankKeeper = keeper.NewBaseKeeperWithDeferredCache(suite.app.AppCodec(), suite.app.GetKey(types.StoreKey),
@@ -1379,6 +1382,7 @@ func (suite *IntegrationTestSuite) TestMintCoinRestrictions() {
 	suite.app.AccountKeeper = authkeeper.NewAccountKeeper(
 		suite.app.AppCodec(), suite.app.GetKey(authtypes.StoreKey), suite.app.GetSubspace(authtypes.ModuleName),
 		authtypes.ProtoBaseAccount, maccPerms,
+		authcodec.NewBech32Codec("bank"),
 	)
 	suite.app.AccountKeeper.SetModuleAccount(suite.ctx, multiPermAcc)
 
